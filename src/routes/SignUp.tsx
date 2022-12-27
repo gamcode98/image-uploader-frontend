@@ -10,7 +10,7 @@ import { Container } from '@mui/system'
 import React from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
-const Form = (): JSX.Element => {
+const SignUp = (): JSX.Element => {
   const [showPassword, setShowPassword] = React.useState(false)
 
   const handleClickShowPassword = (): void => setShowPassword(show => !show)
@@ -77,7 +77,7 @@ const Form = (): JSX.Element => {
           />
 
           <Button variant='contained' size='large' type='submit'>
-            Register me
+            Sign Up
           </Button>
         </Stack>
       </Paper>
@@ -85,4 +85,4 @@ const Form = (): JSX.Element => {
   )
 }
 
-export { Form }
+export { SignUp }
