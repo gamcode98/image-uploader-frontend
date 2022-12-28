@@ -1,9 +1,27 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
 import { Container } from '@mui/system'
+import React from 'react'
 // eslint-disable-next-line import/no-absolute-path
 import ImageUploader from '/image.svg'
 
 const UploadImage = (): JSX.Element => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault()
+    e.stopPropagation()
+    const file = e.dataTransfer.files[0]
+    console.log({ file })
+  }
+
   return (
     <Container
       maxWidth='sm'
@@ -43,6 +61,7 @@ const UploadImage = (): JSX.Element => {
 
         <Stack
           spacing={4}
+          component='div'
           sx={{
             border: '2px dashed #97BEF4',
             p: '2rem',
@@ -50,6 +69,10 @@ const UploadImage = (): JSX.Element => {
             backgroundColor: '#F6F8FB',
             mb: '1rem'
           }}
+          draggable
+          onDragOver={(e) => handleDragOver(e)}
+          onDragLeave={(e) => handleDragLeave(e)}
+          onDrop={(e) => handleDrop(e)}
         >
           <Box
             component='img'
