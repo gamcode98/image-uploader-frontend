@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   IconButton,
   InputAdornment,
@@ -7,20 +8,69 @@ import {
   TextField
 } from '@mui/material'
 import { Container } from '@mui/system'
-import React from 'react'
+import { useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
+import { postWithoutToken } from '../api'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import { ILogin } from '../interfaces/ILogin'
+import axios, { AxiosResponse } from 'axios'
+import { IAxiosReponse } from '../interfaces/IAxiosReponse'
 
 const Login = (): JSX.Element => {
-  const [showPassword, setShowPassword] = React.useState(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleClickShowPassword = (): void => setShowPassword(show => !show)
 
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.preventDefault()
   }
+
+  const initialValues = (): ILogin => {
+    return {
+      email: 'gam@gmail.com',
+      password: '123okA#s'
+    }
+  }
+
+  const validationSchema = (): Yup.InferType<any > => {
+    return {
+      email: Yup.string()
+        .required('This field is required')
+        .matches(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, 'Must be a valid email address'),
+      password: Yup.string()
+        .min(7, 'Too Short!')
+        .max(17, 'Too Long!')
+        .required('This field is required')
+        .matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/, 'Must contain at least one upper case English letter, one lower case English letter, one number and one special character')
+    }
+  }
+
+  const formik = useFormik<ILogin>({
+    initialValues: initialValues(),
+    validationSchema: Yup.object(validationSchema()),
+    onSubmit: (values) => {
+      const { email, password } = values
+      setLoading(!loading)
+
+      postWithoutToken('/api/v1/auth/login', { email, password })
+        .then(({ data }: AxiosResponse<IAxiosReponse>) => {
+          console.log(data.response)
+        })
+        .catch((error: unknown) => {
+          if (axios.isAxiosError(error)) {
+            const { message } = error.response?.data
+            setError(message)
+            setTimeout(() => setError(null), 5000)
+          }
+        })
+        .finally(() => setLoading(false))
+    }
+
+  })
 
   return (
     <Container
@@ -44,6 +94,12 @@ const Login = (): JSX.Element => {
             label='Email'
             variant='outlined'
             fullWidth
+            error={(formik.touched.email ?? false) && Boolean(formik.errors.email)}
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            helperText={(formik.touched.email ?? false) && (formik.errors.email !== null) &&
+              formik.errors.email}
           />
 
           <TextField
@@ -51,6 +107,12 @@ const Login = (): JSX.Element => {
             label='Password'
             variant='outlined'
             fullWidth
+            error={(formik.touched.password ?? false) && Boolean(formik.errors.password)}
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            helperText={(formik.touched.password ?? false) && (formik.errors.password !== null) &&
+              formik.errors.password}
             type={showPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
@@ -60,6 +122,7 @@ const Login = (): JSX.Element => {
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
                     edge='end'
+                    type='button'
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -68,9 +131,17 @@ const Login = (): JSX.Element => {
             }}
           />
 
-          <Button variant='contained' size='large' type='submit'>
-            Login
+          {error !== null && (<Alert severity='error'>{error}</Alert>)}
+
+          <Button
+            variant='contained'
+            size='large'
+            disabled={loading}
+            onClick={() => formik.handleSubmit()}
+          >
+            {!loading ? 'Login' : 'Sending...'}
           </Button>
+
         </Stack>
         <Stack direction='row' justifyContent='space-between'>
           <Button
