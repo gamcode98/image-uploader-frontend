@@ -10,18 +10,21 @@ import {
 import { Container } from '@mui/system'
 import { useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { ILogin } from '../interfaces/ILogin'
 import axios, { AxiosResponse } from 'axios'
 import { IAxiosReponse } from '../interfaces/IAxiosReponse'
+import { useLocalStorage } from './../hooks/useLocalStorage'
 
 const Login = (): JSX.Element => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
+  const [, setToken] = useLocalStorage('token', '')
 
   const handleClickShowPassword = (): void => setShowPassword(show => !show)
 
@@ -59,6 +62,8 @@ const Login = (): JSX.Element => {
       postWithoutToken('/api/v1/auth/login', { email, password })
         .then(({ data }: AxiosResponse<IAxiosReponse>) => {
           console.log(data.response)
+          setToken(data.response.token)
+          navigate('/upload-image')
         })
         .catch((error: unknown) => {
           if (axios.isAxiosError(error)) {

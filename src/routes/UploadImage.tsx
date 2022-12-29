@@ -1,6 +1,9 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
 import { Container } from '@mui/system'
 import React from 'react'
+import { postWithtToken } from '../api'
+import axios, { AxiosResponse } from 'axios'
+import { IAxiosReponse } from '../interfaces/IAxiosReponse'
 // eslint-disable-next-line import/no-absolute-path
 import ImageUploader from '/image.svg'
 
@@ -15,18 +18,40 @@ const UploadImage = (): JSX.Element => {
     e.stopPropagation()
   }
 
+  const uploadImage = (file: File | undefined): void => {
+    const formData = new FormData()
+
+    if (file !== undefined) {
+      formData.append('file', file)
+
+      postWithtToken('/api/v1/images/upload', formData)
+        .then(({ data }: AxiosResponse<IAxiosReponse>) => {
+          console.log(data)
+        }).catch((error: unknown) => {
+          if (axios.isAxiosError(error)) {
+            console.log(error)
+          }
+        })
+    }
+  }
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault()
     e.stopPropagation()
     const file = e.dataTransfer.files[0]
-    console.log({ file })
+    uploadImage(file)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0]
+    uploadImage(file)
   }
 
   return (
     <Container
       maxWidth='sm'
       sx={{
-        height: '100vh',
+        height: '90vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -117,7 +142,11 @@ const UploadImage = (): JSX.Element => {
           }}
         >
           Choose a file
-          <input type='file' hidden />
+          <input
+            type='file'
+            hidden
+            onChange={(e) => handleChange(e)}
+          />
         </Button>
 
       </Paper>
