@@ -1,14 +1,31 @@
-import { Box, Button, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Paper, Skeleton, Typography } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
+import { Alert, Button, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Paper, Snackbar, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { getWithtToken } from '../api'
+import { deleteWithtToken, getWithtToken } from '../api'
 import { AxiosResponse } from 'axios'
 import { IIMagesDto } from '../dto/image.dto'
 import { IImage } from '../interfaces/IImage'
+import { Link } from 'react-router-dom'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { IServerResponse } from '../interfaces/IServerResponse'
 
 const MySpace = (): JSX.Element => {
   const [images, setImages] = useState<IImage[]>([])
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [isImageDeleted, setIsImageDeleted] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false)
+  const matches = useMediaQuery('(min-width:450px)')
+
+  const handleDeleteImg = (id: string): void => {
+    deleteWithtToken(`/images/${id}`)
+      .then(({ data }: AxiosResponse<IServerResponse>) => {
+        setIsImageDeleted(true)
+        setOpen(true)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
 
   useEffect(() => {
     getWithtToken('/images')
@@ -19,9 +36,14 @@ const MySpace = (): JSX.Element => {
       .catch(error => {
         console.log(error)
       })
-  }, [])
+  }, [isImageDeleted])
 
-  const handleClick = (path: string): void => setImageUrl(path)
+  const handleClipBoard = (url: string): void => {
+    void navigator.clipboard.writeText(url)
+      .then(() => setOpen(true))
+  }
+
+  const handleClose = (): void => setOpen(false)
 
   return (
     <Grid
@@ -30,117 +52,86 @@ const MySpace = (): JSX.Element => {
       alignItems='center'
       spacing={1}
     >
-      <Grid item xs={12} lg={7}>
-        <ImageList
-          sx={{
-            height: {
-              xs: 200,
-              md: 300,
-              lg: '85vh'
-            }
-          }}
-        >
-          {images.map((image) => (
-            <ImageListItem key={image._id}>
-              <img
-                src={`${image.path}?w=248&fit=crop&auto=format`}
-                srcSet={`${image.path}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                alt={image.name}
-                loading='lazy'
-              />
-              <ImageListItemBar
-                title={image.name}
-                subtitle={image.name}
-                actionIcon={
-                  <IconButton
-                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                    aria-label={`info about ${image.name}`}
-                    onClick={() => handleClick(image.path)}
-                  >
-                    <InfoIcon />
-                  </IconButton>
-            }
-              />
-            </ImageListItem>
-          ))}
-        </ImageList>
-      </Grid>
-      <Grid item lg={4} sx={{ display: { xs: 'none', lg: 'block' } }}>
-        {/* <Box>
-          <Typography variant='h5' sx={{ mb: 1 }}>
-            Select any image to show actions...
-          </Typography>
-        </Box> */}
-        <Paper
-          elevation={3}
-          sx={{
-            p: '2rem',
-            width: '80%',
-            borderRadius: '.5rem'
-          }}
-        >
-
-          <Typography
-            variant='h6'
-            textAlign='center'
-            component='h1'
-            mb='1.5rem'
-          >Select any image to show actions...
-          </Typography>
-          {imageUrl === null
-            ? (
-              <Skeleton
-                animation='wave'
-                variant='rounded'
-                width='100%'
-                height='330px'
-                sx={{ mb: '1.5rem' }}
-              />
-
-              )
-            : <Box
-                component='img'
-                src={imageUrl}
-                alt='image uploaded.'
-                sx={{ display: 'block', width: '100%', borderRadius: '.5rem', mb: '1.5rem' }}
-              />}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '.5rem',
-              width: '100%',
-              border: '1px solid #E0E0E0',
-              backgroundColor: '#F6F8FB',
-              borderRadius: '.5rem'
-            }}
-          >
-            <Typography
-              variant='body2'
-              sx={{
-                padding: '.5rem',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                color: '#4F4F4F'
-              }}
+      {images.length > 0
+        ? (
+          <Grid item xs={12} lg={10}>
+            <ImageList
+              variant='masonry'
+              cols={matches ? 2 : 1}
             >
-              {imageUrl}
-            </Typography>
-            <Button
-              variant='contained'
-              size='small'
-              sx={{
-                padding: '.5rem',
-                textTransform: 'initial',
-                width: '200px'
-              }}
-            >Copy Link
-            </Button>
-          </Box>
-        </Paper>
-      </Grid>
+              {images.map((image) => (
+                <ImageListItem cols={4} key={image._id}>
+                  <img
+                    src={`${image.path}?w=248&fit=crop&auto=format`}
+                    srcSet={`${image.path}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    alt={image.name}
+                    loading='lazy'
+                  />
+                  <ImageListItemBar
+                    title={image.name}
+                    subtitle={image.name}
+                    actionIcon={
+                      <>
+                        <IconButton
+                          sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                          aria-label={`info about ${image.name}`}
+                          onClick={() => handleClipBoard(image.path)}
+                        >
+                          <ContentPasteIcon sx={{ width: '1.5rem', height: '1.5rem' }} />
+                        </IconButton>
+                        <IconButton
+                          sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                          aria-label={`info about ${image.name}`}
+                          onClick={() => handleDeleteImg(image._id)}
+                        >
+                          <DeleteForeverIcon sx={{ width: '1.7rem', height: '1.7rem' }} />
+                        </IconButton>
+                      </>
+                    }
+                  />
+                </ImageListItem>
+              ))}
+            </ImageList>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+              <Alert onClose={handleClose} severity='success' sx={{ width: '100%' }}>
+                Url copied successfully!
+              </Alert>
+            </Snackbar>
+            <Snackbar open={isImageDeleted} autoHideDuration={6000} onClose={handleClose}>
+              <Alert onClose={handleClose} severity='error' sx={{ width: '100%' }}>
+                Image deleted successfully!
+              </Alert>
+            </Snackbar>
+          </Grid>
+
+          )
+        : (
+          <Grid item xs={10} lg={3} mt={20}>
+            <Paper
+              elevation={3}
+              sx={{ p: '1.5rem' }}
+            >
+              <Typography variant='h5' align='center' mb='1rem'>
+                There are not images available
+              </Typography>
+              <Button
+                variant='contained'
+                size='large'
+                sx={{
+                  display: 'block',
+                  mx: 'auto',
+                  textTransform: 'initial',
+                  fontSize: '1rem',
+                  textAlign: 'center'
+                }}
+                component={Link}
+                to='/upload-image'
+              >
+                Click here to add one
+              </Button>
+            </Paper>
+          </Grid>
+          )}
     </Grid>
   )
 }

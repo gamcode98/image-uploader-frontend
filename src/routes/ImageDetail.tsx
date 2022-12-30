@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Skeleton, Typography } from '@mui/material'
+import { Alert, Box, Button, Paper, Skeleton, Snackbar, Typography } from '@mui/material'
 import { Container } from '@mui/system'
 import axios, { AxiosResponse } from 'axios'
 import { useEffect, useState } from 'react'
@@ -8,7 +8,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { IIMageDto } from '../dto/image.dto'
 
 const ImageDetail = (): JSX.Element => {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageUrl, setImageUrl] = useState<string>('')
+  const [open, setOpen] = useState<boolean>(false)
+
   const params = useParams<string>()
 
   useEffect(() => {
@@ -25,6 +27,13 @@ const ImageDetail = (): JSX.Element => {
         })
     }
   }, [])
+
+  const handleClipBoard = (url: string): void => {
+    void navigator.clipboard.writeText(url)
+      .then(() => setOpen(true))
+  }
+
+  const handleClose = (): void => setOpen(false)
 
   return (
     <Container
@@ -110,11 +119,16 @@ const ImageDetail = (): JSX.Element => {
               textTransform: 'initial',
               width: '200px'
             }}
+            onClick={() => handleClipBoard(imageUrl)}
           >Copy Link
           </Button>
         </Box>
       </Paper>
-
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity='success' sx={{ width: '100%' }}>
+          Url copied successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }
