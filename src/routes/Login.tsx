@@ -14,10 +14,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { ILogin } from '../interfaces/ILogin'
 import axios, { AxiosResponse } from 'axios'
-import { IAxiosReponse } from '../interfaces/IAxiosReponse'
 import { useLocalStorage } from './../hooks/useLocalStorage'
+import { ILoginDto, LoginFormik } from '../dto/auth.dto'
 
 const Login = (): JSX.Element => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -32,7 +31,7 @@ const Login = (): JSX.Element => {
     event.preventDefault()
   }
 
-  const initialValues = (): ILogin => {
+  const initialValues = (): LoginFormik => {
     return {
       email: 'gam@gmail.com',
       password: '123okA#s'
@@ -52,18 +51,18 @@ const Login = (): JSX.Element => {
     }
   }
 
-  const formik = useFormik<ILogin>({
+  const formik = useFormik<LoginFormik>({
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),
     onSubmit: (values) => {
       const { email, password } = values
       setLoading(!loading)
 
-      postWithoutToken('/api/v1/auth/login', { email, password })
-        .then(({ data }: AxiosResponse<IAxiosReponse>) => {
+      postWithoutToken('/auth/login', { email, password })
+        .then(({ data }: AxiosResponse<ILoginDto>) => {
           console.log(data.response)
           setToken(data.response.token)
-          navigate('/upload-image')
+          navigate('/my-space')
         })
         .catch((error: unknown) => {
           if (axios.isAxiosError(error)) {

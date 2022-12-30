@@ -1,21 +1,20 @@
 import { Box, Button, Paper, Skeleton, Typography } from '@mui/material'
 import { Container } from '@mui/system'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getWithtToken } from '../api'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { IIMageDto } from '../dto/image.dto'
 
 const ImageDetail = (): JSX.Element => {
-  const [imageUrl, setImageUrl] = useState(null)
-  const params = useParams()
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const params = useParams<string>()
 
   useEffect(() => {
-    console.log('id ', params.id)
-
     if (params.id !== undefined) {
-      getWithtToken(`/api/v1/images/${params.id}`)
-        .then(({ data }: any) => {
+      getWithtToken(`/images/${params.id}`)
+        .then(({ data }: AxiosResponse<IIMageDto>) => {
           console.log({ data })
           setImageUrl(data.response.path)
         })

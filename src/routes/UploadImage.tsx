@@ -3,10 +3,10 @@ import { Container } from '@mui/system'
 import React, { useState } from 'react'
 import { postWithtToken } from '../api'
 import axios, { AxiosProgressEvent, AxiosResponse } from 'axios'
-import { IAxiosReponse } from '../interfaces/IAxiosReponse'
 // eslint-disable-next-line import/no-absolute-path
 import ImageUploader from '/image.svg'
 import { useNavigate } from 'react-router-dom'
+import { IIMageDto } from '../dto/image.dto'
 
 const UploadImage = (): JSX.Element => {
   const [progress, setProgress] = useState(0)
@@ -31,7 +31,7 @@ const UploadImage = (): JSX.Element => {
       formData.append('file', file)
       setIsLoading(true)
 
-      postWithtToken('/api/v1/images/upload', formData,
+      postWithtToken('/images/upload', formData,
         (progressEvent: AxiosProgressEvent) => {
           const { loaded, total } = progressEvent
           if (total !== undefined) {
@@ -40,7 +40,7 @@ const UploadImage = (): JSX.Element => {
             console.log({ percent })
           }
         })
-        .then(({ data }: AxiosResponse<IAxiosReponse>) => {
+        .then(({ data }: AxiosResponse<IIMageDto>) => {
           console.log(data)
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           navigate(`/image-detail/${data.response._id}`)
