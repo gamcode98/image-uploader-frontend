@@ -5,9 +5,11 @@ import {
   InputAdornment,
   Paper,
   Stack,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 import { Container } from '@mui/system'
+import CloudIcon from '@mui/icons-material/Cloud'
 import { useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { Link, useNavigate } from 'react-router-dom'
@@ -66,6 +68,7 @@ const Login = (): JSX.Element => {
         })
         .catch((error: unknown) => {
           if (axios.isAxiosError(error)) {
+            console.log({ error })
             const { message } = error.response?.data
             setError(message)
             setTimeout(() => setError(null), 5000)
@@ -91,6 +94,23 @@ const Login = (): JSX.Element => {
         sx={{ padding: '1rem', borderRadius: '.5rem' }}
         component='form'
       >
+        <Stack direction='row' justifyContent='center' alignItems='center' mt='1rem' mb='2rem'>
+          <CloudIcon sx={{ mr: 2, color: 'hsl(210, 79%, 46%)' }} />
+          <Typography
+            variant='h6'
+            noWrap
+            sx={{
+              mr: 2,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.2rem',
+              color: 'hsl(210, 79%, 46%)',
+              textDecoration: 'none'
+            }}
+          >
+            tiny cloud
+          </Typography>
+        </Stack>
         <Stack spacing={2} marginBottom='1rem'>
 
           <TextField
@@ -159,10 +179,10 @@ const Login = (): JSX.Element => {
           </Button>
           <Button
             variant='text'
-            href='/signup'
             size='small'
             sx={{ textDecoration: 'underline', textTransform: 'initial' }}
-            LinkComponent={Link}
+            component={Link}
+            to='/signup'
           >
             Don't have an account? Sign Up
           </Button>

@@ -34,6 +34,8 @@ const UploadImage = (): JSX.Element => {
       postWithtToken('/images/upload', formData,
         (progressEvent: AxiosProgressEvent) => {
           const { loaded, total } = progressEvent
+          console.log({ progressEvent })
+
           if (total !== undefined) {
             const percent = Math.round((loaded * 100) / total)
             setProgress(percent)

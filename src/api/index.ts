@@ -44,9 +44,7 @@ const getWithtToken = async (url: string, progressFn?: any): Promise<any> => {
     headers: {
       Authorization: `Bearer ${tokenParsed}`
     },
-    onUploadProgress: () => {
-      console.log('funa??')
-    }
+    onDownloadProgress: progressFn
   })
 }
 

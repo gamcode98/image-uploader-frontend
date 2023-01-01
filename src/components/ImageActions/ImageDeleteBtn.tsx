@@ -13,7 +13,7 @@ const ImageDeleteBtn = (
     deleteWithtToken(`/images/${id}`)
       .then(({ data }: AxiosResponse<IServerResponse>) => {
         setImages(images.filter(image => image._id !== id))
-        setOpenDangerAlert(true)
+        setOpenDangerAlert(prev => !prev)
       })
       .catch(error => {
         console.log(error)

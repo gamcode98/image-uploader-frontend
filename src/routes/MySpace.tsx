@@ -1,4 +1,4 @@
-import { Alert, CircularProgress, Grid, Snackbar } from '@mui/material'
+import { Alert, Backdrop, CircularProgress, Grid, Snackbar } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getWithtToken } from '../api'
 import { AxiosResponse } from 'axios'
@@ -37,7 +37,14 @@ const MySpace = (): JSX.Element => {
       spacing={1}
     >
       {loading
-        ? (<CircularProgress />)
+        ? (
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}
+          >
+            <CircularProgress color='inherit' />
+          </Backdrop>
+          )
         : (
           <>
             {images.length > 0

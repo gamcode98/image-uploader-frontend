@@ -12,25 +12,13 @@ import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import CloudIcon from '@mui/icons-material/Cloud'
-import { Outlet, Link } from 'react-router-dom'
-
-const pages = [
-  {
-    id: crypto.randomUUID(),
-    name: 'My space',
-    route: 'my-space'
-  },
-  {
-    id: crypto.randomUUID(),
-    name: 'Upload an image',
-    route: 'upload-image'
-  }
-]
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
+import { Outlet, Link, useNavigate } from 'react-router-dom'
 
 const Navigation = (): JSX.Element => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
+
+  const navigate = useNavigate()
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorElNav(event.currentTarget)
@@ -40,12 +28,35 @@ const Navigation = (): JSX.Element => {
     setAnchorElUser(event.currentTarget)
   }
 
-  const handleCloseNavMenu = (): void => {
-    setAnchorElNav(null)
+  const handleCloseNavMenu = (): void => setAnchorElNav(null)
+
+  const handleCloseUserMenu = (): void => setAnchorElUser(null)
+
+  const pages = [
+    {
+      id: crypto.randomUUID(),
+      name: 'My space',
+      route: 'my-space'
+    },
+    {
+      id: crypto.randomUUID(),
+      name: 'Upload an image',
+      route: 'upload-image'
+    }
+  ]
+  const settings = ['Account', 'Logout']
+
+  interface ActionsToSettings {
+    logout: () => void
+    account: () => void
   }
 
-  const handleCloseUserMenu = (): void => {
-    setAnchorElUser(null)
+  const handleActionsToSettings: ActionsToSettings = {
+    logout: () => {
+      localStorage.removeItem('token')
+      navigate('/')
+    },
+    account: () => navigate('/account')
   }
 
   return (
@@ -57,8 +68,8 @@ const Navigation = (): JSX.Element => {
             <Typography
               variant='h6'
               noWrap
-              component='a'
-              href='/'
+              component={Link}
+              to='/my-space'
               sx={{
                 mr: 2,
                 display: { xs: 'none', md: 'flex' },
@@ -117,8 +128,8 @@ const Navigation = (): JSX.Element => {
             <Typography
               variant='h5'
               noWrap
-              component='a'
-              href=''
+              component={Link}
+              to='/my-space'
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'none' },
@@ -170,7 +181,11 @@ const Navigation = (): JSX.Element => {
               >
                 {settings.map((setting) => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign='center'>{setting}</Typography>
+                    <Typography
+                      textAlign='center'
+                      onClick={handleActionsToSettings[`${setting.toLowerCase() as keyof ActionsToSettings}`]}
+                    >{setting}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
