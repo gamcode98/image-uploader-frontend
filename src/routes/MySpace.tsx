@@ -1,16 +1,19 @@
-import { Alert, Button, CircularProgress, Grid, Paper, Snackbar, Typography } from '@mui/material'
+import { Alert, CircularProgress, Grid, Snackbar } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getWithtToken } from '../api'
 import { AxiosResponse } from 'axios'
 import { IIMagesDto } from '../dto/image.dto'
 import { IImage } from '../interfaces/IImage'
-import { Link } from 'react-router-dom'
 import { Images } from '../components/Images/Images'
 import { Image } from '../components/Image/Image'
+import { ImageClipBoardBtn } from '../components/ImageActions/ImageClipBoardBtn'
+import { ImageDeleteBtn } from '../components/ImageActions/ImageDeleteBtn'
+import { NoImagesAvailable } from '../components/NoImagesAvailable/NoImagesAvailable'
 
 const MySpace = (): JSX.Element => {
+  const [openSuccessAlert, setOpenSuccessAlert] = useState<boolean>(false)
+  const [openDangerAlert, setOpenDangerAlert] = useState<boolean>(false)
   const [images, setImages] = useState<IImage[]>([])
-
   const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
@@ -41,55 +44,41 @@ const MySpace = (): JSX.Element => {
               ? (
                 <Grid item xs={12} lg={10}>
                   <Images>
-                    {images.map((image: IImage) => (
-                      <Image key={image._id} images={images} setImages={setImages} image={image} />
+                    {images.map((image) => (
+                      <Image key={image._id} image={image}>
+                        <ImageClipBoardBtn
+                          image={image}
+                          setOpenSuccessAlert={setOpenSuccessAlert}
+                        />
+                        <ImageDeleteBtn
+                          image={image}
+                          images={images}
+                          setImages={setImages}
+                          setOpenDangerAlert={setOpenDangerAlert}
+                        />
+                      </Image>
                     ))}
                   </Images>
-                  {/* <Snackbar
+                  <Snackbar
                     open={openSuccessAlert} autoHideDuration={6000}
                     onClose={() => setOpenSuccessAlert(false)}
                   >
                     <Alert onClose={() => setOpenSuccessAlert(false)} severity='success' sx={{ width: '100%' }}>
                       Url copied successfully!
                     </Alert>
-                  </Snackbar> */}
-                  {/* <Snackbar
+                  </Snackbar>
+                  <Snackbar
                     open={openDangerAlert} autoHideDuration={6000}
                     onClose={() => setOpenDangerAlert(false)}
                   >
                     <Alert onClose={() => setOpenDangerAlert(false)} severity='error' sx={{ width: '100%' }}>
                       Image deleted successfully!
                     </Alert>
-                  </Snackbar> */}
+                  </Snackbar>
                 </Grid>
-
                 )
               : (
-                <Grid item xs={10} lg={3} mt={20}>
-                  <Paper
-                    elevation={3}
-                    sx={{ p: '1.5rem' }}
-                  >
-                    <Typography variant='h5' align='center' mb='1rem'>
-                      There are not images available
-                    </Typography>
-                    <Button
-                      variant='contained'
-                      size='large'
-                      sx={{
-                        display: 'block',
-                        mx: 'auto',
-                        textTransform: 'initial',
-                        fontSize: '1rem',
-                        textAlign: 'center'
-                      }}
-                      component={Link}
-                      to='/upload-image'
-                    >
-                      Click here to add one
-                    </Button>
-                  </Paper>
-                </Grid>
+                <NoImagesAvailable />
                 )}
           </>
           )}
