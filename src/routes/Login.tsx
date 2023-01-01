@@ -141,6 +141,7 @@ const Login = (): JSX.Element => {
             variant='contained'
             size='large'
             disabled={loading}
+            sx={{ textTransform: 'initial' }}
             onClick={() => formik.handleSubmit()}
           >
             {!loading ? 'Login' : 'Sending...'}

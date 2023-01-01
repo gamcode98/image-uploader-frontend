@@ -44,7 +44,9 @@ const getWithtToken = async (url: string, progressFn?: any): Promise<any> => {
     headers: {
       Authorization: `Bearer ${tokenParsed}`
     },
-    onUploadProgress: progressFn
+    onUploadProgress: () => {
+      console.log('funa??')
+    }
   })
 }
 
@@ -63,6 +65,7 @@ const deleteWithtToken = async (url: string, progressFn?: any): Promise<any> => 
       Authorization: `Bearer ${tokenParsed}`
     },
     onUploadProgress: progressFn
+
   })
 }
 
