@@ -1,17 +1,6 @@
-import {
-  Alert,
-  Button,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Button, Stack } from '@mui/material'
 import { Container } from '@mui/system'
-import CloudIcon from '@mui/icons-material/Cloud'
 import { useState } from 'react'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
 import { useFormik } from 'formik'
@@ -19,19 +8,17 @@ import * as Yup from 'yup'
 import axios, { AxiosResponse } from 'axios'
 import { useLocalStorage } from './../hooks/useLocalStorage'
 import { ILoginDto, LoginFormik } from '../dto/auth.dto'
+import { Form } from '../components/Forms/Form'
+import { Email } from '../components/FormFields/Email'
+import { Password } from '../components/FormFields/Password'
+import { FormButton } from '../components/FormButtons/FormButton'
+import { Logo } from '../components/Logo/Logo'
 
 const Login = (): JSX.Element => {
-  const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
   const [, setToken] = useLocalStorage('token', '')
-
-  const handleClickShowPassword = (): void => setShowPassword(show => !show)
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>): void => {
-    event.preventDefault()
-  }
+  const navigate = useNavigate()
 
   const initialValues = (): LoginFormik => {
     return {
@@ -89,85 +76,13 @@ const Login = (): JSX.Element => {
         alignItems: 'center'
       }}
     >
-      <Paper
-        elevation={2}
-        sx={{ padding: '1rem', borderRadius: '.5rem' }}
-        component='form'
+      <Form
+        error={error}
+        logo={() => <Logo />}
+        email={() => <Email formik={formik} />}
+        password={() => <Password formik={formik} />}
+        button={() => <FormButton loading={loading} formik={formik} action='Login' />}
       >
-        <Stack direction='row' justifyContent='center' alignItems='center' mt='1rem' mb='2rem'>
-          <CloudIcon sx={{ mr: 2, color: 'hsl(210, 79%, 46%)' }} />
-          <Typography
-            variant='h6'
-            noWrap
-            sx={{
-              mr: 2,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.2rem',
-              color: 'hsl(210, 79%, 46%)',
-              textDecoration: 'none'
-            }}
-          >
-            tiny cloud
-          </Typography>
-        </Stack>
-        <Stack spacing={2} marginBottom='1rem'>
-
-          <TextField
-            id='email'
-            label='Email'
-            variant='outlined'
-            fullWidth
-            error={(formik.touched.email ?? false) && Boolean(formik.errors.email)}
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            helperText={(formik.touched.email ?? false) && (formik.errors.email !== null) &&
-              formik.errors.email}
-          />
-
-          <TextField
-            id='password'
-            label='Password'
-            variant='outlined'
-            fullWidth
-            error={(formik.touched.password ?? false) && Boolean(formik.errors.password)}
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            helperText={(formik.touched.password ?? false) && (formik.errors.password !== null) &&
-              formik.errors.password}
-            type={showPassword ? 'text' : 'password'}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton
-                    aria-label='toggle password visibility'
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge='end'
-                    type='button'
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-
-          {error !== null && (<Alert severity='error'>{error}</Alert>)}
-
-          <Button
-            variant='contained'
-            size='large'
-            disabled={loading}
-            sx={{ textTransform: 'initial' }}
-            onClick={() => formik.handleSubmit()}
-          >
-            {!loading ? 'Login' : 'Sending...'}
-          </Button>
-
-        </Stack>
         <Stack direction='row' justifyContent='space-between'>
           <Button
             variant='text'
@@ -187,7 +102,7 @@ const Login = (): JSX.Element => {
             Don't have an account? Sign Up
           </Button>
         </Stack>
-      </Paper>
+      </Form>
     </Container>
   )
 }

@@ -1,38 +1,24 @@
-import {
-  Alert,
-  Button,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Button } from '@mui/material'
 import { Container } from '@mui/system'
-import CloudIcon from '@mui/icons-material/Cloud'
-import React, { useState } from 'react'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { SignUpFormik } from '../dto/auth.dto'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { postWithoutToken } from '../api'
 import axios, { AxiosResponse } from 'axios'
+import { Form } from '../components/Forms/Form'
+import { Logo } from '../components/Logo/Logo'
+import { Email } from '../components/FormFields/Email'
+import { Password } from '../components/FormFields/Password'
+import { FormButton } from '../components/FormButtons/FormButton'
+import { Username } from '../components/FormFields/Username'
 
 const SignUp = (): JSX.Element => {
-  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
   const navigate = useNavigate()
-
-  const handleClickShowPassword = (): void => setShowPassword(show => !show)
-
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    event.preventDefault()
-  }
 
   const initialValues = (): SignUpFormik => {
     return {
@@ -64,10 +50,10 @@ const SignUp = (): JSX.Element => {
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),
     onSubmit: (values) => {
-      const { email, password } = values
+      const { username, email, password } = values
       setLoading(!loading)
 
-      postWithoutToken('/auth/signup', { email, password })
+      postWithoutToken('/auth/signup', { username, email, password })
         .then(({ data }: AxiosResponse<any>) => {
           console.log(data.response)
           // setToken(data.response.token)
@@ -96,94 +82,14 @@ const SignUp = (): JSX.Element => {
         alignItems: 'center'
       }}
     >
-      <Paper
-        elevation={2}
-        sx={{ padding: '1rem', borderRadius: '.5rem' }}
-        component='form'
+      <Form
+        error={error}
+        logo={() => <Logo />}
+        username={() => <Username formik={formik} />}
+        email={() => <Email formik={formik} />}
+        password={() => <Password formik={formik} />}
+        button={() => <FormButton loading={loading} formik={formik} action='Sign Up' />}
       >
-        <Stack direction='row' justifyContent='center' alignItems='center' mt='1rem' mb='2rem'>
-          <CloudIcon sx={{ mr: 2, color: 'hsl(210, 79%, 46%)' }} />
-          <Typography
-            variant='h6'
-            noWrap
-            sx={{
-              mr: 2,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.2rem',
-              color: 'hsl(210, 79%, 46%)',
-              textDecoration: 'none'
-            }}
-          >
-            tiny cloud
-          </Typography>
-        </Stack>
-        <Stack spacing={2} mb='1rem'>
-          <TextField
-            id='username'
-            label='Username'
-            variant='outlined'
-            fullWidth
-            error={(formik.touched.username ?? false) && Boolean(formik.errors.username)}
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            helperText={(formik.touched.username ?? false) && (formik.errors.username !== null) &&
-              formik.errors.username}
-          />
-
-          <TextField
-            id='email'
-            label='Email'
-            variant='outlined'
-            fullWidth
-            error={(formik.touched.email ?? false) && Boolean(formik.errors.email)}
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            helperText={(formik.touched.email ?? false) && (formik.errors.email !== null) &&
-              formik.errors.email}
-          />
-
-          <TextField
-            id='password'
-            label='Password'
-            variant='outlined'
-            fullWidth
-            error={(formik.touched.password ?? false) && Boolean(formik.errors.password)}
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            helperText={(formik.touched.password ?? false) && (formik.errors.password !== null) &&
-              formik.errors.password}
-            type={showPassword ? 'text' : 'password'}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton
-                    aria-label='toggle password visibility'
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge='end'
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-
-          {error !== null && (<Alert severity='error'>{error}</Alert>)}
-
-          <Button
-            variant='contained' size='large' type='submit'
-            sx={{ textTransform: 'initial' }}
-            disabled={loading}
-            onClick={() => formik.handleSubmit()}
-          >
-            {!loading ? 'Sign Up' : 'Sending...'}
-          </Button>
-        </Stack>
         <Button
           variant='text'
           size='small'
@@ -193,7 +99,7 @@ const SignUp = (): JSX.Element => {
         >
           Do you have an account? Login
         </Button>
-      </Paper>
+      </Form>
     </Container>
   )
 }
