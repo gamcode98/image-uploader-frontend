@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useContext } from 'react'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
@@ -13,10 +13,14 @@ import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import CloudIcon from '@mui/icons-material/Cloud'
 import { Outlet, Link, useNavigate } from 'react-router-dom'
+import { UserContext } from '../context/UserContext'
 
 const Navigation = (): JSX.Element => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(
+    null
+  )
+  const { currentUser } = useContext(UserContext)
 
   const navigate = useNavigate()
 
@@ -112,13 +116,18 @@ const Navigation = (): JSX.Element => {
                   display: { xs: 'block', md: 'none' }
                 }}
               >
-                {pages.map((page) => (
+                {pages.map(page => (
                   <MenuItem key={page.id} onClick={handleCloseNavMenu}>
                     <Typography
                       component={Link}
                       to={`/${page.route}`}
-                      sx={{ textDecoration: 'none', color: 'black', textAlign: 'center' }}
-                    >{page.name}
+                      sx={{
+                        textDecoration: 'none',
+                        color: 'black',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {page.name}
                     </Typography>
                   </MenuItem>
                 ))}
@@ -144,7 +153,7 @@ const Navigation = (): JSX.Element => {
               tiny cloud
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.map(page => (
                 <Button
                   key={page.id}
                   component={Link}
@@ -160,7 +169,11 @@ const Navigation = (): JSX.Element => {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title='Open settings'>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
+                  <Avatar
+                    alt={currentUser.username}
+                    sx={{ backgroundColor: '#bdbdbe' }}
+                    src={`https://robohash.org/${currentUser.username}`}
+                  />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -179,12 +192,17 @@ const Navigation = (): JSX.Element => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
+                {settings.map(setting => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
                     <Typography
                       textAlign='center'
-                      onClick={handleActionsToSettings[`${setting.toLowerCase() as keyof ActionsToSettings}`]}
-                    >{setting}
+                      onClick={
+                        handleActionsToSettings[
+                          `${setting.toLowerCase() as keyof ActionsToSettings}`
+                        ]
+                      }
+                    >
+                      {setting}
                     </Typography>
                   </MenuItem>
                 ))}

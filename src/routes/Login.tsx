@@ -1,6 +1,6 @@
 import { Button, Stack } from '@mui/material'
 import { Container } from '@mui/system'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
 import { useFormik } from 'formik'
@@ -13,43 +13,54 @@ import { Email } from '../components/FormFields/Email'
 import { Password } from '../components/FormFields/Password'
 import { FormButton } from '../components/FormButtons/FormButton'
 import { Logo } from '../components/Logo/Logo'
+import { UserContext } from '../context/UserContext'
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [, setToken] = useLocalStorage('token', '')
+
   const navigate = useNavigate()
+
+  const { setCurrentUser } = useContext(UserContext)
 
   const initialValues = (): LoginFormik => {
     return {
       email: 'gam@gmail.com',
-      password: '123okA#s'
+      password: '456okA#s'
     }
   }
 
-  const validationSchema = (): Yup.InferType<any > => {
+  const validationSchema = (): Yup.InferType<any> => {
     return {
       email: Yup.string()
         .required('This field is required')
-        .matches(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, 'Must be a valid email address'),
+        .matches(
+          /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
+          'Must be a valid email address'
+        ),
       password: Yup.string()
         .min(7, 'Too Short!')
         .max(17, 'Too Long!')
         .required('This field is required')
-        .matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/, 'Must contain at least one upper case English letter, one lower case English letter, one number and one special character')
+        .matches(
+          /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+          'Must contain at least one upper case English letter, one lower case English letter, one number and one special character'
+        )
     }
   }
 
   const formik = useFormik<LoginFormik>({
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),
-    onSubmit: (values) => {
+    onSubmit: values => {
       const { email, password } = values
       setLoading(!loading)
 
       postWithoutToken('/auth/login', { email, password })
         .then(({ data }: AxiosResponse<ILoginDto>) => {
-          console.log(data.response)
+          console.log(data.response.user)
+          setCurrentUser(data.response.user)
           setToken(data.response.token)
           navigate('/my-space')
         })
@@ -63,7 +74,6 @@ const Login = (): JSX.Element => {
         })
         .finally(() => setLoading(false))
     }
-
   })
 
   return (
@@ -81,7 +91,9 @@ const Login = (): JSX.Element => {
         logo={() => <Logo />}
         email={() => <Email formik={formik} />}
         password={() => <Password formik={formik} />}
-        button={() => <FormButton loading={loading} formik={formik} action='Login' />}
+        button={() => (
+          <FormButton loading={loading} formik={formik} action='Login' />
+        )}
       >
         <Stack direction='row' justifyContent='space-between'>
           <Button
@@ -90,7 +102,8 @@ const Login = (): JSX.Element => {
             size='small'
             sx={{ textDecoration: 'underline', textTransform: 'initial' }}
             LinkComponent={Link}
-          >Forgot password?
+          >
+            Forgot password?
           </Button>
           <Button
             variant='text'

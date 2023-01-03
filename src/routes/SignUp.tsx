@@ -53,7 +53,7 @@ const SignUp = (): JSX.Element => {
       const { username, email, password } = values
       setLoading(!loading)
 
-      postWithoutToken('/auth/signup', { username, email, password })
+      postWithoutToken('/auth/register', { username, email, password })
         .then(({ data }: AxiosResponse<any>) => {
           console.log(data.response)
           // setToken(data.response.token)

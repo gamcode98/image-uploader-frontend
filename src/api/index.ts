@@ -67,4 +67,23 @@ const deleteWithtToken = async (url: string, progressFn?: any): Promise<any> => 
   })
 }
 
-export { postWithoutToken, postWithtToken, getWithtToken, deleteWithtToken }
+const patchWithtToken = async (url: string, data: any, progressFn?: any): Promise<any> => {
+  if (tokenParsed === null) {
+    return {
+      data: {
+        failed: true,
+        message: 'You must provide a token'
+      }
+    }
+  }
+
+  return await instance.patch(url, data, {
+    headers: {
+      Authorization: `Bearer ${tokenParsed}`
+    },
+    onUploadProgress: progressFn
+
+  })
+}
+
+export { postWithoutToken, postWithtToken, getWithtToken, deleteWithtToken, patchWithtToken }

@@ -1,10 +1,10 @@
 import { Button } from '@mui/material'
 import { FormikProps } from 'formik'
-import { LoginFormik, SignUpFormik } from '../../dto/auth.dto'
+import { ChangePasswordFormik, LoginFormik, SignUpFormik, UpdateFormik } from '../../dto/auth.dto'
 
 interface Props {
   loading: boolean
-  formik: FormikProps<SignUpFormik> | FormikProps<LoginFormik>
+  formik: FormikProps<SignUpFormik> | FormikProps<LoginFormik> | FormikProps<UpdateFormik> | FormikProps<ChangePasswordFormik>
   action: string
 }
 

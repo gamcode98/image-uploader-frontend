@@ -2,13 +2,14 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 import { FormikProps } from 'formik'
 import { useState } from 'react'
-import { LoginFormik, SignUpFormik, UpdateFormik } from '../../dto/auth.dto'
+import { ChangePasswordFormik } from '../../dto/auth.dto'
 
 interface Props {
-  formik: FormikProps<SignUpFormik> | FormikProps<LoginFormik> | FormikProps<UpdateFormik>
+  formik: FormikProps<ChangePasswordFormik>
+  field: keyof ChangePasswordFormik
 }
 
-const Password = ({ formik }: Props): JSX.Element => {
+const PasswordToChange = ({ formik, field }: Props): JSX.Element => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const handleClickShowPassword = (): void => setShowPassword(show => !show)
@@ -17,18 +18,24 @@ const Password = ({ formik }: Props): JSX.Element => {
     event.preventDefault()
   }
 
+  const labelTexts = {
+    oldPassword: 'Old Password',
+    newPassword: 'New Password',
+    confirmPassword: 'Confirm Password'
+  }
+
   return (
     <TextField
-      id='password'
-      label='Password'
+      id={field}
+      label={labelTexts[field]}
       variant='outlined'
       fullWidth
-      error={(formik.touched.password ?? false) && Boolean(formik.errors.password)}
-      value={formik.values.password}
+      error={(formik.touched[field] ?? false) && Boolean(formik.errors[field])}
+      value={formik.values[field]}
       onChange={formik.handleChange}
       onBlur={formik.handleBlur}
-      helperText={(formik.touched.password ?? false) && (formik.errors.password !== null) &&
-              formik.errors.password}
+      helperText={(formik.touched[field] ?? false) && (formik.errors[field] !== null) &&
+              formik.errors[field]}
       type={showPassword ? 'text' : 'password'}
       InputProps={{
         endAdornment: (
@@ -49,4 +56,4 @@ const Password = ({ formik }: Props): JSX.Element => {
   )
 }
 
-export { Password }
+export { PasswordToChange }

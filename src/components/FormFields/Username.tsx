@@ -1,8 +1,8 @@
 import { TextField } from '@mui/material'
 import { FormikProps } from 'formik'
-import { SignUpFormik } from '../../dto/auth.dto'
+import { SignUpFormik, UpdateFormik } from '../../dto/auth.dto'
 
-interface Props { formik: FormikProps<SignUpFormik> }
+interface Props { formik: FormikProps<SignUpFormik> | FormikProps<UpdateFormik> }
 
 const Username = ({ formik }: Props): JSX.Element => {
   return (

@@ -1,7 +1,7 @@
 import { Alert, Paper, Stack } from '@mui/material'
 
 interface Props {
-  children: JSX.Element | JSX.Element[]
+  children?: JSX.Element | JSX.Element[]
   error: string | null
   logo?: () => JSX.Element
   username?: () => JSX.Element

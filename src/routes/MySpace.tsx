@@ -47,7 +47,7 @@ const MySpace = (): JSX.Element => {
           )
         : (
           <>
-            {images.length > 0
+            {(images.length > 0)
               ? (
                 <Grid item xs={12} lg={10}>
                   <Images>
