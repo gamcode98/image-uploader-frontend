@@ -2,7 +2,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 import { FormikProps } from 'formik'
 import { useState } from 'react'
-import { ChangePasswordFormik } from '../../dto/auth.dto'
+import { ChangePasswordForgotFormik, ChangePasswordFormik } from '../../dto/auth.dto'
 
 interface Props {
   formik: FormikProps<ChangePasswordFormik>

@@ -28,7 +28,6 @@ const DeleteAccount = (): JSX.Element => {
     deleteWithtToken('/users')
       .then(({ data }) => {
         setLoading(true)
-        console.log(data)
         navigate('/')
       })
       .catch(error => {

@@ -84,7 +84,7 @@ const SignUp = (): JSX.Element => {
     >
       <Form
         error={error}
-        logo={() => <Logo />}
+        informComponent={() => <Logo />}
         username={() => <Username formik={formik} />}
         email={() => <Email formik={formik} />}
         password={() => <Password formik={formik} />}

@@ -21,3 +21,7 @@ export interface ChangePasswordFormik {
   newPassword: string
   confirmPassword: string
 }
+
+export type ChangePasswordForgotFormik = Omit<ChangePasswordFormik, 'oldPassword' >
+
+export interface EmailFormik { email: string }

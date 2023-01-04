@@ -88,7 +88,7 @@ const Login = (): JSX.Element => {
     >
       <Form
         error={error}
-        logo={() => <Logo />}
+        informComponent={() => <Logo />}
         email={() => <Email formik={formik} />}
         password={() => <Password formik={formik} />}
         button={() => (
@@ -98,10 +98,10 @@ const Login = (): JSX.Element => {
         <Stack direction='row' justifyContent='space-between'>
           <Button
             variant='text'
-            href='/recovery-password'
             size='small'
             sx={{ textDecoration: 'underline', textTransform: 'initial' }}
-            LinkComponent={Link}
+            component={Link}
+            to='/recover-password'
           >
             Forgot password?
           </Button>
