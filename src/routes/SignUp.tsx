@@ -1,4 +1,5 @@
-import { Button } from '@mui/material'
+/* eslint-disable react/jsx-indent */
+import { Alert, Button } from '@mui/material'
 import { Container } from '@mui/system'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -17,6 +18,7 @@ import { Username } from '../components/FormFields/Username'
 const SignUp = (): JSX.Element => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
 
   const navigate = useNavigate()
 
@@ -42,7 +44,10 @@ const SignUp = (): JSX.Element => {
         .min(7, 'Too Short!')
         .max(17, 'Too Long!')
         .required('This field is required')
-        .matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/, 'Must contain at least one upper case English letter, one lower case English letter, one number and one special character')
+        .matches(
+          /^(?=.*?[A-ZÀ-Ú])(?=.*?[a-zà-ú])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+          'Must contain at least one upper case letter, one lower case letter, one number and one special character'
+        )
     }
   }
 
@@ -51,13 +56,17 @@ const SignUp = (): JSX.Element => {
     validationSchema: Yup.object(validationSchema()),
     onSubmit: (values) => {
       const { username, email, password } = values
-      setLoading(!loading)
+      setLoading(true)
 
       postWithoutToken('/auth/register', { username, email, password })
         .then(({ data }: AxiosResponse<any>) => {
           console.log(data.response)
-          // setToken(data.response.token)
-          navigate('/')
+          setShowSuccessAlert(true)
+          setLoading(false)
+          setTimeout(() => {
+            setShowSuccessAlert(false)
+            navigate('/')
+          }, 5000)
         })
         .catch((error: unknown) => {
           if (axios.isAxiosError(error)) {
@@ -65,14 +74,15 @@ const SignUp = (): JSX.Element => {
             const { message } = error.response?.data
             setError(message)
             setTimeout(() => setError(null), 5000)
+            setLoading(false)
           }
         })
-        .finally(() => setLoading(false))
     }
 
   })
 
   return (
+
     <Container
       maxWidth='sm'
       sx={{
@@ -90,17 +100,27 @@ const SignUp = (): JSX.Element => {
         password={() => <Password formik={formik} />}
         button={() => <FormButton loading={loading} formik={formik} action='Sign Up' />}
       >
+
+        {showSuccessAlert
+          ? <Alert severity='success' sx={{ mb: '1rem' }}>
+            Success — <strong>you are registered now, redirecting to login...</strong>
+            </Alert>
+          : <div />}
+
         <Button
           variant='text'
           size='small'
           sx={{ textDecoration: 'underline', textTransform: 'initial' }}
           component={Link}
+          disabled={loading}
           to='/'
         >
           Do you have an account? Login
         </Button>
+
       </Form>
     </Container>
+
   )
 }
 

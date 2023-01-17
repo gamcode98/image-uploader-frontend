@@ -26,8 +26,8 @@ const Login = (): JSX.Element => {
 
   const initialValues = (): LoginFormik => {
     return {
-      email: 'gam@gmail.com',
-      password: '456okA#s'
+      email: '',
+      password: ''
     }
   }
 
@@ -44,8 +44,8 @@ const Login = (): JSX.Element => {
         .max(17, 'Too Long!')
         .required('This field is required')
         .matches(
-          /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
-          'Must contain at least one upper case English letter, one lower case English letter, one number and one special character'
+          /^(?=.*?[A-ZÀ-Ú])(?=.*?[a-zà-ú])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+          'Must contain at least one upper case letter, one lower case letter, one number and one special character'
         )
     }
   }
@@ -101,6 +101,7 @@ const Login = (): JSX.Element => {
             size='small'
             sx={{ textDecoration: 'underline', textTransform: 'initial' }}
             component={Link}
+            disabled={loading}
             to='/recover-password'
           >
             Forgot password?
@@ -110,6 +111,7 @@ const Login = (): JSX.Element => {
             size='small'
             sx={{ textDecoration: 'underline', textTransform: 'initial' }}
             component={Link}
+            disabled={loading}
             to='/signup'
           >
             Don't have an account? Sign Up

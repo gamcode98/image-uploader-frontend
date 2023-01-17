@@ -10,7 +10,9 @@ interface Props {
   button: () => JSX.Element
 }
 
-const Form = ({ children, error, informComponent, username, email, password, button }: Props): JSX.Element => {
+const Form = (props: Props): JSX.Element => {
+  const { children, error, informComponent, username, email, password, button } = props
+
   return (
     <Paper
       elevation={2}
