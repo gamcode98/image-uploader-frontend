@@ -3,7 +3,7 @@ import { Container } from '@mui/system'
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
-import { Formik, FormikProps, useFormik } from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import axios, { AxiosResponse } from 'axios'
 import { useLocalStorage } from '../hooks/useLocalStorage'
@@ -63,14 +63,12 @@ const Login = (): JSX.Element => {
 
           postWithoutToken('/auth/login', { email, password })
             .then(({ data }: AxiosResponse<ILoginDto>) => {
-              console.log(data.response.user)
               setCurrentUser(data.response.user)
               setToken(data.response.token)
               navigate('/my-space')
             })
             .catch((error: unknown) => {
               if (axios.isAxiosError(error)) {
-                console.log({ error })
                 const { message } = error.response?.data
                 setError(message)
                 setTimeout(() => setError(null), 5000)
@@ -113,6 +111,7 @@ const Login = (): JSX.Element => {
               >
                 Don't have an account? Sign Up
               </Button>
+
             </Stack>
           </Form>
         )}

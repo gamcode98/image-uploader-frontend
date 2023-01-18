@@ -2,13 +2,23 @@ import { IconButton } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import { IImage } from '../../interfaces/IImage'
 
-const ImageClipBoardBtn = (
-  { image, setOpenSuccessAlert }:
-  { image: IImage, setOpenSuccessAlert: React.Dispatch<React.SetStateAction<boolean>> }):
-JSX.Element => {
+interface Alert {
+  successAlert: boolean
+  dangerAlert: boolean
+}
+
+interface Props {
+  image: IImage
+  setOpenAlert: React.Dispatch<React.SetStateAction<Alert>>
+  openAlert: Alert
+}
+
+const ImageClipBoardBtn = (props: Props): JSX.Element => {
+  const { image, setOpenAlert, openAlert } = props
+
   const handleClipBoard = (url: string): void => {
     void navigator.clipboard.writeText(url)
-      .then(() => setOpenSuccessAlert(true))
+      .then(() => setOpenAlert({ ...openAlert, successAlert: true }))
   }
 
   return (

@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material'
+import { Alert, Grid, Typography } from '@mui/material'
 import { Formik } from 'formik'
 import { FormButton } from '../components/FormButtons/FormButton'
 import { Email } from '../components/FormFields/Email'
@@ -16,6 +16,7 @@ import { DeleteAccount } from '../components/DeleteAccount/DeleteAccount'
 const Account = (): JSX.Element => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false)
 
   const { currentUser } = useContext(UserContext)
 
@@ -58,11 +59,11 @@ const Account = (): JSX.Element => {
             patchWithtToken('/users', { username, email })
               .then(({ data }: AxiosResponse<any>) => {
                 console.log(data.response)
-              // setToken(data.response.token)
+                setShowSuccessAlert(true)
+                setTimeout(() => setShowSuccessAlert(false), 5000)
               })
               .catch((error: unknown) => {
                 if (axios.isAxiosError(error)) {
-                  console.log({ error })
                   const { message } = error.response?.data
                   setError(message)
                   setTimeout(() => setError(null), 5000)
@@ -79,6 +80,10 @@ const Account = (): JSX.Element => {
               email={() => <Email name='email' />}
               button={() => <FormButton loading={loading} action='Update' />}
             >
+              {showSuccessAlert
+                ? <Alert severity='success' sx={{ my: '1rem' }}>User updated successfully</Alert>
+                : <></>}
+
               <Typography variant='body2' textAlign='center' mb='1rem'>Or</Typography>
               <DeleteAccount />
             </Form>

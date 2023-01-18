@@ -7,6 +7,7 @@ interface Props {
 
 const FormButton = ({ loading, action }: Props): JSX.Element => {
   return (
+
     <Button
       variant='contained'
       size='large'
@@ -16,6 +17,7 @@ const FormButton = ({ loading, action }: Props): JSX.Element => {
     >
       {!loading ? action : 'Sending...'}
     </Button>
+
   )
 }
 

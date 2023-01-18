@@ -5,15 +5,27 @@ import { AxiosResponse } from 'axios'
 import { IServerResponse } from '../../interfaces/IServerResponse'
 import { IImage } from '../../interfaces/IImage'
 
-const ImageDeleteBtn = (
-  { image, images, setImages, setOpenDangerAlert }:
-  { image: IImage, images: IImage[], setImages: React.Dispatch<React.SetStateAction<IImage[]>>, setOpenDangerAlert: React.Dispatch<React.SetStateAction<boolean>> }
-): JSX.Element => {
+interface Alert {
+  successAlert: boolean
+  dangerAlert: boolean
+}
+
+interface Props {
+  image: IImage
+  images: IImage[]
+  setImages: React.Dispatch<React.SetStateAction<IImage[]>>
+  setOpenAlert: React.Dispatch<React.SetStateAction<Alert>>
+  openAlert: Alert
+}
+
+const ImageDeleteBtn = (props: Props): JSX.Element => {
+  const { image, images, setImages, setOpenAlert, openAlert } = props
+
   const handleDeleteImg = (id: string): void => {
     deleteWithtToken(`/images/${id}`)
       .then(({ data }: AxiosResponse<IServerResponse>) => {
+        setOpenAlert({ ...openAlert, dangerAlert: true })
         setImages(images.filter(image => image._id !== id))
-        setOpenDangerAlert(prev => !prev)
       })
       .catch(error => {
         console.log(error)

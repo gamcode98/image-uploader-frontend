@@ -1,12 +1,12 @@
 import { Box, Button, LinearProgress, Paper, Stack, Typography } from '@mui/material'
 import { Container } from '@mui/system'
 import React, { useState } from 'react'
-import { postWithtToken } from '../api'
+import { useNavigate } from 'react-router-dom'
 import axios, { AxiosProgressEvent, AxiosResponse } from 'axios'
 // eslint-disable-next-line import/no-absolute-path
 import ImageUploader from '/image.svg'
-import { useNavigate } from 'react-router-dom'
 import { IIMageDto } from '../dto/image.dto'
+import { postWithtToken } from '../api'
 
 const UploadImage = (): JSX.Element => {
   const [progress, setProgress] = useState(0)
@@ -34,7 +34,6 @@ const UploadImage = (): JSX.Element => {
       postWithtToken('/images/upload', formData,
         (progressEvent: AxiosProgressEvent) => {
           const { loaded, total } = progressEvent
-          console.log({ progressEvent })
 
           if (total !== undefined) {
             const percent = Math.round((loaded * 100) / total)
@@ -43,8 +42,6 @@ const UploadImage = (): JSX.Element => {
           }
         })
         .then(({ data }: AxiosResponse<IIMageDto>) => {
-          console.log(data)
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           navigate(`/image-detail/${data.response._id}`)
         }).catch((error: unknown) => {
           if (axios.isAxiosError(error)) {

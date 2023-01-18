@@ -11,16 +11,17 @@ import { ImageDeleteBtn } from '../components/ImageActions/ImageDeleteBtn'
 import { NoImagesAvailable } from '../components/NoImagesAvailable/NoImagesAvailable'
 
 const MySpace = (): JSX.Element => {
-  const [openSuccessAlert, setOpenSuccessAlert] = useState<boolean>(false)
-  const [openDangerAlert, setOpenDangerAlert] = useState<boolean>(false)
   const [images, setImages] = useState<IImage[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [openAlert, setOpenAlert] = useState({
+    successAlert: false,
+    dangerAlert: false
+  })
 
   useEffect(() => {
     setLoading(true)
     getWithtToken('/images')
       .then(({ data }: AxiosResponse<IIMagesDto>) => {
-        console.log({ data })
         setImages(data.response)
       })
       .catch(error => {
@@ -55,37 +56,50 @@ const MySpace = (): JSX.Element => {
                       <Image key={image._id} image={image}>
                         <ImageClipBoardBtn
                           image={image}
-                          setOpenSuccessAlert={setOpenSuccessAlert}
+                          openAlert={openAlert}
+                          setOpenAlert={setOpenAlert}
                         />
                         <ImageDeleteBtn
                           image={image}
                           images={images}
                           setImages={setImages}
-                          setOpenDangerAlert={setOpenDangerAlert}
+                          openAlert={openAlert}
+                          setOpenAlert={setOpenAlert}
                         />
                       </Image>
                     ))}
                   </Images>
+
                   <Snackbar
-                    open={openSuccessAlert} autoHideDuration={6000}
-                    onClose={() => setOpenSuccessAlert(false)}
+                    open={openAlert.successAlert} autoHideDuration={6000}
+                    onClose={() => setOpenAlert({ ...openAlert, successAlert: false })}
                   >
-                    <Alert onClose={() => setOpenSuccessAlert(false)} severity='success' sx={{ width: '100%' }}>
+                    <Alert onClose={() => setOpenAlert({ ...openAlert, successAlert: false })} severity='success' sx={{ width: '100%' }}>
                       Url copied successfully!
                     </Alert>
                   </Snackbar>
                   <Snackbar
-                    open={openDangerAlert} autoHideDuration={6000}
-                    onClose={() => setOpenDangerAlert(false)}
+                    open={openAlert.dangerAlert} autoHideDuration={6000}
+                    onClose={() => setOpenAlert({ ...openAlert, dangerAlert: false })}
                   >
-                    <Alert onClose={() => setOpenDangerAlert(false)} severity='error' sx={{ width: '100%' }}>
+                    <Alert onClose={() => setOpenAlert({ ...openAlert, dangerAlert: false })} severity='error' sx={{ width: '100%' }}>
                       Image deleted successfully!
                     </Alert>
                   </Snackbar>
                 </Grid>
                 )
               : (
-                <NoImagesAvailable />
+                <>
+                  <NoImagesAvailable />
+                  <Snackbar
+                    open={openAlert.dangerAlert} autoHideDuration={6000}
+                    onClose={() => setOpenAlert({ ...openAlert, dangerAlert: false })}
+                  >
+                    <Alert onClose={() => setOpenAlert({ ...openAlert, dangerAlert: false })} severity='error' sx={{ width: '100%' }}>
+                      Image deleted successfully!
+                    </Alert>
+                  </Snackbar>
+                </>
                 )}
           </>
           )}
