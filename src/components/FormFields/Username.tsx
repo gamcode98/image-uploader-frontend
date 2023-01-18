@@ -1,22 +1,24 @@
+/* eslint-disable react/jsx-handler-names */
 import { TextField } from '@mui/material'
-import { FormikProps } from 'formik'
-import { SignUpFormik, UpdateFormik } from '../../dto/auth.dto'
+import { useField } from 'formik'
 
-interface Props { formik: FormikProps<SignUpFormik> | FormikProps<UpdateFormik> }
+interface Props {name: string}
 
-const Username = ({ formik }: Props): JSX.Element => {
+const Username = ({ name }: Props): JSX.Element => {
+  const [field, meta] = useField(name)
+
   return (
     <TextField
       id='username'
       label='Username'
       variant='outlined'
       fullWidth
-      error={(formik.touched.username ?? false) && Boolean(formik.errors.username)}
-      value={formik.values.username}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      helperText={(formik.touched.username ?? false) && (formik.errors.username !== null) &&
-              formik.errors.username}
+      error={(meta.touched ?? false) && Boolean(meta.error)}
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      helperText={(meta.touched ?? false) && (meta.error !== null) &&
+              meta.error}
     />
   )
 }

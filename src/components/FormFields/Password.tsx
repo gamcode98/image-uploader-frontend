@@ -1,14 +1,17 @@
+/* eslint-disable react/jsx-handler-names */
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
-import { FormikProps } from 'formik'
+import { useField } from 'formik'
 import { useState } from 'react'
-import { LoginFormik, SignUpFormik, UpdateFormik } from '../../dto/auth.dto'
 
 interface Props {
-  formik: FormikProps<SignUpFormik> | FormikProps<LoginFormik> | FormikProps<UpdateFormik>
+  name: string
+  [x: string]: any
 }
 
-const Password = ({ formik }: Props): JSX.Element => {
+const Password = ({ name, ...props }: Props): JSX.Element => {
+  const [field, meta] = useField(name)
+
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const handleClickShowPassword = (): void => setShowPassword(show => !show)
@@ -19,16 +22,15 @@ const Password = ({ formik }: Props): JSX.Element => {
 
   return (
     <TextField
-      id='password'
-      label='Password'
+      {...props}
       variant='outlined'
       fullWidth
-      error={(formik.touched.password ?? false) && Boolean(formik.errors.password)}
-      value={formik.values.password}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      helperText={(formik.touched.password ?? false) && (formik.errors.password !== null) &&
-              formik.errors.password}
+      error={(meta.touched ?? false) && Boolean(meta.error)}
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      helperText={(meta.touched ?? false) && (meta.error !== null) &&
+              meta.error}
       type={showPassword ? 'text' : 'password'}
       InputProps={{
         endAdornment: (

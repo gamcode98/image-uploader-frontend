@@ -25,9 +25,10 @@ const DeleteAccount = (): JSX.Element => {
   const handleClose = (): void => setOpen(false)
 
   const handleDelete = (): void => {
+    setLoading(true)
     deleteWithtToken('/users')
-      .then(({ data }) => {
-        setLoading(true)
+      .then(() => {
+        setLoading(false)
         navigate('/')
       })
       .catch(error => {
@@ -65,6 +66,7 @@ const DeleteAccount = (): JSX.Element => {
               variant='contained'
               color='error'
               sx={{ textTransform: 'initial', width: '50%' }}
+              disabled={loading}
               onClick={handleDelete}
             >
               {loading ? 'Removing...' : 'Confirm'}

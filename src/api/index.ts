@@ -8,12 +8,18 @@ const instance = axios.create({ baseURL })
 
 const postWithoutToken = (url: string, data: any): any => instance.post(url, data)
 
-const tokenStored: any = localStorage.getItem('token')
+const getTokenStored = (): string => {
+  const tokenStored: any = localStorage.getItem('token')
 
-const tokenParsed: string = JSON.parse(tokenStored)
+  const tokenParsed: string = JSON.parse(tokenStored)
+
+  return tokenParsed
+}
 
 const postWithtToken = async (url: string, data: any, progressFn?: any): Promise<any> => {
-  if (tokenParsed === null) {
+  const token = getTokenStored()
+
+  if (token === null) {
     return {
       data: {
         failed: true,
@@ -24,14 +30,16 @@ const postWithtToken = async (url: string, data: any, progressFn?: any): Promise
 
   return await instance.post(url, data, {
     headers: {
-      Authorization: `Bearer ${tokenParsed}`
+      Authorization: `Bearer ${token}`
     },
     onUploadProgress: progressFn
   })
 }
 
 const getWithtToken = async (url: string, progressFn?: any): Promise<any> => {
-  if (tokenParsed === null) {
+  const token = getTokenStored()
+
+  if (token === null) {
     return {
       data: {
         failed: true,
@@ -42,14 +50,16 @@ const getWithtToken = async (url: string, progressFn?: any): Promise<any> => {
 
   return await instance.get(url, {
     headers: {
-      Authorization: `Bearer ${tokenParsed}`
+      Authorization: `Bearer ${token}`
     },
     onDownloadProgress: progressFn
   })
 }
 
 const deleteWithtToken = async (url: string, progressFn?: any): Promise<any> => {
-  if (tokenParsed === null) {
+  const token = getTokenStored()
+
+  if (token === null) {
     return {
       data: {
         failed: true,
@@ -60,7 +70,7 @@ const deleteWithtToken = async (url: string, progressFn?: any): Promise<any> => 
 
   return await instance.delete(url, {
     headers: {
-      Authorization: `Bearer ${tokenParsed}`
+      Authorization: `Bearer ${token}`
     },
     onUploadProgress: progressFn
 
@@ -68,7 +78,9 @@ const deleteWithtToken = async (url: string, progressFn?: any): Promise<any> => 
 }
 
 const patchWithtToken = async (url: string, data: any, progressFn?: any): Promise<any> => {
-  if (tokenParsed === null) {
+  const token = getTokenStored()
+
+  if (token === null) {
     return {
       data: {
         failed: true,
@@ -79,7 +91,7 @@ const patchWithtToken = async (url: string, data: any, progressFn?: any): Promis
 
   return await instance.patch(url, data, {
     headers: {
-      Authorization: `Bearer ${tokenParsed}`
+      Authorization: `Bearer ${token}`
     },
     onUploadProgress: progressFn
 

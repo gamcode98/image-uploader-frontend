@@ -1,7 +1,12 @@
 import { ImageListItem, ImageListItemBar } from '@mui/material'
 import { IImage } from '../../interfaces/IImage'
 
-const Image = ({ image, children }: { image: IImage, children: JSX.Element[] }): JSX.Element => {
+interface Props {
+  image: IImage
+  children: JSX.Element[]
+}
+
+const Image = ({ image, children }: Props): JSX.Element => {
   return (
     <ImageListItem cols={4} key={image._id}>
       <img

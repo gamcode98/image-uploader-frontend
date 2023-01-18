@@ -3,17 +3,17 @@ import { Container } from '@mui/system'
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { postWithoutToken } from '../api'
-import { useFormik } from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import axios, { AxiosResponse } from 'axios'
-import { useLocalStorage } from './../hooks/useLocalStorage'
-import { ILoginDto, LoginFormik } from '../dto/auth.dto'
-import { Form } from '../components/Forms/Form'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { ILoginDto } from '../dto/auth.dto'
 import { Email } from '../components/FormFields/Email'
 import { Password } from '../components/FormFields/Password'
 import { FormButton } from '../components/FormButtons/FormButton'
 import { Logo } from '../components/Logo/Logo'
 import { UserContext } from '../context/UserContext'
+import { Form } from '../components/Forms/Form'
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -24,56 +24,24 @@ const Login = (): JSX.Element => {
 
   const { setCurrentUser } = useContext(UserContext)
 
-  const initialValues = (): LoginFormik => {
-    return {
-      email: '',
-      password: ''
-    }
-  }
+  const initialValues = { email: '', password: '' }
 
-  const validationSchema = (): Yup.InferType<any> => {
-    return {
-      email: Yup.string()
-        .required('This field is required')
-        .matches(
-          /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
-          'Must be a valid email address'
-        ),
-      password: Yup.string()
-        .min(7, 'Too Short!')
-        .max(17, 'Too Long!')
-        .required('This field is required')
-        .matches(
-          /^(?=.*?[A-ZÀ-Ú])(?=.*?[a-zà-ú])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
-          'Must contain at least one upper case letter, one lower case letter, one number and one special character'
-        )
-    }
-  }
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .required('This field is required')
+      .matches(
+        /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
+        'Must be a valid email address'
+      ),
+    password: Yup.string()
+      .min(7, 'Too Short!')
+      .max(17, 'Too Long!')
+      .required('This field is required')
+      .matches(
+        /^(?=.*?[A-ZÀ-Ú])(?=.*?[a-zà-ú])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+        'Must contain at least one upper case letter, one lower case letter, one number and one special character'
+      )
 
-  const formik = useFormik<LoginFormik>({
-    initialValues: initialValues(),
-    validationSchema: Yup.object(validationSchema()),
-    onSubmit: values => {
-      const { email, password } = values
-      setLoading(!loading)
-
-      postWithoutToken('/auth/login', { email, password })
-        .then(({ data }: AxiosResponse<ILoginDto>) => {
-          console.log(data.response.user)
-          setCurrentUser(data.response.user)
-          setToken(data.response.token)
-          navigate('/my-space')
-        })
-        .catch((error: unknown) => {
-          if (axios.isAxiosError(error)) {
-            console.log({ error })
-            const { message } = error.response?.data
-            setError(message)
-            setTimeout(() => setError(null), 5000)
-          }
-        })
-        .finally(() => setLoading(false))
-    }
   })
 
   return (
@@ -86,38 +54,69 @@ const Login = (): JSX.Element => {
         alignItems: 'center'
       }}
     >
-      <Form
-        error={error}
-        informComponent={() => <Logo />}
-        email={() => <Email formik={formik} />}
-        password={() => <Password formik={formik} />}
-        button={() => (
-          <FormButton loading={loading} formik={formik} action='Login' />
-        )}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={(values) => {
+          const { email, password } = values
+          setLoading(!loading)
+
+          postWithoutToken('/auth/login', { email, password })
+            .then(({ data }: AxiosResponse<ILoginDto>) => {
+              setCurrentUser(data.response.user)
+              setToken(data.response.token)
+              navigate('/my-space')
+            })
+            .catch((error: unknown) => {
+              if (axios.isAxiosError(error)) {
+                const { message } = error.response?.data
+                setError(message)
+                setTimeout(() => setError(null), 5000)
+              }
+            })
+            .finally(() => setLoading(false))
+        }}
       >
-        <Stack direction='row' justifyContent='space-between'>
-          <Button
-            variant='text'
-            size='small'
-            sx={{ textDecoration: 'underline', textTransform: 'initial' }}
-            component={Link}
-            disabled={loading}
-            to='/recover-password'
+        {(formik) => (
+          <Form
+            onSubmit={formik.handleSubmit}
+            informComponent={() => <Logo />}
+            error={error}
+            email={() => <Email name='email' />}
+            password={() =>
+              <Password
+                name='password' id='password'
+                label='Password'
+              />}
+            button={() => (
+              <FormButton loading={loading} action='Login' />
+            )}
           >
-            Forgot password?
-          </Button>
-          <Button
-            variant='text'
-            size='small'
-            sx={{ textDecoration: 'underline', textTransform: 'initial' }}
-            component={Link}
-            disabled={loading}
-            to='/signup'
-          >
-            Don't have an account? Sign Up
-          </Button>
-        </Stack>
-      </Form>
+            <Stack direction='row' justifyContent='space-between'>
+              <Button
+                variant='text' size='small' type='button'
+                sx={{ textDecoration: 'underline', textTransform: 'initial' }}
+                component={Link}
+                disabled={loading}
+                to='/recover-password'
+              >
+                Forgot password?
+              </Button>
+              <Button
+                variant='text' size='small' type='button'
+                sx={{ textDecoration: 'underline', textTransform: 'initial' }}
+                component={Link}
+                disabled={loading}
+                to='/signup'
+              >
+                Don't have an account? Sign Up
+              </Button>
+
+            </Stack>
+          </Form>
+        )}
+      </Formik>
+
     </Container>
   )
 }

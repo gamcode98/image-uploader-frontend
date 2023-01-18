@@ -1,14 +1,14 @@
 import { Alert, Box, Button, Paper, Skeleton, Snackbar, Typography } from '@mui/material'
 import { Container } from '@mui/system'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import axios, { AxiosResponse } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getWithtToken } from '../api'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { IIMageDto } from '../dto/image.dto'
 
 const ImageDetail = (): JSX.Element => {
-  const [imageUrl, setImageUrl] = useState<string>('')
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [open, setOpen] = useState<boolean>(false)
 
   const params = useParams<string>()
@@ -17,7 +17,6 @@ const ImageDetail = (): JSX.Element => {
     if (params.id !== undefined) {
       getWithtToken(`/images/${params.id}`)
         .then(({ data }: AxiosResponse<IIMageDto>) => {
-          console.log({ data })
           setImageUrl(data.response.path)
         })
         .catch((error: unknown) => {
@@ -28,7 +27,8 @@ const ImageDetail = (): JSX.Element => {
     }
   }, [])
 
-  const handleClipBoard = (url: string): void => {
+  const handleClipBoard = (url: string | null): void => {
+    if (url === null) return
     void navigator.clipboard.writeText(url)
       .then(() => setOpen(true))
   }
