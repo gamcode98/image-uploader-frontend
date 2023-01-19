@@ -85,6 +85,8 @@ $ npm install
 $ npm run dev
 ```
 
+You will need to clone too the [backend repository](https://github.com/gamcode98/image-uploader-backend)
+
 **Note**: Replace your *VITE_BACKEND_URL="your_backend_url"* in your **.env** file
 
 ## Acknowledgements
