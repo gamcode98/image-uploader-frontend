@@ -1,4 +1,4 @@
-import { Container, Typography } from '@mui/material'
+import { Alert, Container, Typography } from '@mui/material'
 import { Formik } from 'formik'
 import { Email } from '../components/FormFields/Email'
 import * as Yup from 'yup'
@@ -10,6 +10,7 @@ import { Form } from '../components/Forms/Form'
 
 const RecoverPassword = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
   const initialValues = { email: '' }
@@ -62,6 +63,8 @@ const RecoverPassword = (): JSX.Element => {
           postWithoutToken('/auth/recovery', { email })
             .then(({ data }: AxiosResponse<any>) => {
               console.log(data)
+              setShowSuccessAlert(true)
+              setTimeout(() => setShowSuccessAlert(false), 5000)
             })
             .catch((error: unknown) => {
               if (axios.isAxiosError(error)) {
@@ -81,7 +84,11 @@ const RecoverPassword = (): JSX.Element => {
             informComponent={() => <Inform />}
             email={() => <Email name='email' />}
             button={() => <FormButton loading={loading} action='Submit' />}
-          />
+          >
+            {showSuccessAlert
+              ? <Alert severity='success' sx={{ my: '1rem' }}>Email sent!</Alert>
+              : <></>}
+          </Form>
         )}
 
       </Formik>

@@ -6,7 +6,7 @@ import axios, { AxiosResponse } from 'axios'
 import { useState } from 'react'
 import { FormButton } from '../components/FormButtons/FormButton'
 import { Form } from '../components/Forms/Form'
-import { patchWithtToken } from '../api'
+import { postWithoutToken } from '../api'
 import { Password } from '../components/FormFields/Password'
 
 const ChangePassword = (): JSX.Element => {
@@ -60,7 +60,7 @@ const ChangePassword = (): JSX.Element => {
           const { newPassword } = values
           setLoading(true)
 
-          patchWithtToken('/auth/change-password', { newPassword, token })
+          postWithoutToken('/auth/change-password', { newPassword, token })
             .then(({ data }: AxiosResponse<any>) => {
               console.log(data.response)
               setShowSuccessAlert(true)
