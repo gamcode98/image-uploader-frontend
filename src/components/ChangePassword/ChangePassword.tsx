@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { Alert, Button } from '@mui/material'
 import axios, { AxiosResponse } from 'axios'
 import { Formik } from 'formik'
 import { useState } from 'react'
@@ -12,6 +12,7 @@ const ChangePassword = (): JSX.Element => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false)
 
   const initialValues = {
     oldPassword: '',
@@ -64,16 +65,18 @@ const ChangePassword = (): JSX.Element => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={(values) => {
-            const { oldPassword, newPassword, confirmPassword } = values
+            const { oldPassword, newPassword } = values
             setLoading(true)
 
-            patchWithtToken('/users', { oldPassword, newPassword, confirmPassword })
+            patchWithtToken('/users/change-password', { oldPassword, newPassword })
               .then(({ data }: AxiosResponse<any>) => {
-                console.log(data.response)
+                setShowSuccessAlert(true)
+                setTimeout(() => {
+                  setShowSuccessAlert(false)
+                }, 5000)
               })
               .catch((error: unknown) => {
                 if (axios.isAxiosError(error)) {
-                  console.log({ error })
                   const { message } = error.response?.data
                   setError(message)
                   setTimeout(() => setError(null), 5000)
@@ -95,7 +98,11 @@ const ChangePassword = (): JSX.Element => {
               button={() => (
                 <FormButton loading={loading} action='Save' />
               )}
-            />
+            >
+              {showSuccessAlert
+                ? <Alert severity='success' sx={{ my: '1rem' }}>Password changed successfully</Alert>
+                : <></>}
+            </Form>
           )}
         </Formik>
       )}
