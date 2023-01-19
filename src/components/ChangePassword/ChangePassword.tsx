@@ -65,19 +65,18 @@ const ChangePassword = (): JSX.Element => {
           validationSchema={validationSchema}
           onSubmit={(values) => {
             const { oldPassword, newPassword, confirmPassword } = values
-            // setLoading(!loading)
+            setLoading(true)
 
             patchWithtToken('/users', { oldPassword, newPassword, confirmPassword })
               .then(({ data }: AxiosResponse<any>) => {
                 console.log(data.response)
-              // setToken(data.response.token)
               })
               .catch((error: unknown) => {
                 if (axios.isAxiosError(error)) {
                   console.log({ error })
                   const { message } = error.response?.data
-                // setError(message)
-                // setTimeout(() => setError(null), 5000)
+                  setError(message)
+                  setTimeout(() => setError(null), 5000)
                 }
               })
               .finally(() => setLoading(false))
